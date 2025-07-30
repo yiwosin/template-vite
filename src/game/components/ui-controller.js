@@ -21,14 +21,14 @@ export class UIController extends Phaser.GameObjects.Container {
         const headerHeight = gameHeight * 0.12;                
             
 
-        this.scene.add.graphics()
-        .fillStyle(0x08b3ff, 1)
-        .fillRoundedRect(0, 0, gameWidth, headerHeight,  { tl: 0, tr: 0, bl: 22, br: 22 });
+        // this.scene.add.graphics()
+        // .fillStyle(0x08b3ff, 1)
+        // .fillRoundedRect(0, 0, gameWidth, headerHeight,  { tl: 0, tr: 0, bl: 22, br: 22 });
    
-        // Logo
-        this.scene.add.image(centerX,  headerHeight * 0.45, 'logo')
-            .setScale(Math.min(0.1, 0.1))
-            .setOrigin(0.5);
+        // // Logo
+        // this.scene.add.image(centerX,  headerHeight * 0.45, 'logo')
+        //     .setScale(Math.min(0.1, 0.1))
+        //     .setOrigin(0.5);
 
         // Back button - top left
         const backButton = this.scene.add.image(gameWidth * 0.10, headerHeight * 0.40, 'home')

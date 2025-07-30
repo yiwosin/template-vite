@@ -5,10 +5,11 @@ export class WinChecker {
         this.scene = scene;
     }
 
-    checkForWin(card) {
+    checkForWin(card, cardName = '') {
         const winType = this.detectWin(card);
         if (winType) {
-            this.scene.onGameWon(winType);
+            const winMessage = cardName ? `${cardName} WINS!` : 'BINGO!';
+            this.scene.onGameWon(winType, winMessage);
         }
     }
 

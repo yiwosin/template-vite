@@ -30,11 +30,14 @@ export class NumberManager {
 
         // Rolling area background
         // Rounded rectangle for rolling area
-        this.scene.add.graphics()
-        .fillStyle(0x34495e, 1)
-        .fillRoundedRect(this.rollingArea.x, this.rollingArea.y, 
-            this.rollingArea.width, this.rollingArea.height,  
-            { tl: 22, tr: 22, bl: 22, br: 22 });  
+        this.scene.add.image(this.rollingArea.x, this.rollingArea.y, 'rolling_area')
+            .setDisplaySize(this.rollingArea.width, this.rollingArea.height)
+            .setOrigin(0, 0);
+        // this.scene.add.graphics()
+        // .fillStyle(0x34495e, 1)
+        // .fillRoundedRect(this.rollingArea.x, this.rollingArea.y, 
+        //     this.rollingArea.width, this.rollingArea.height,  
+        //     { tl: 22, tr: 22, bl: 22, br: 22 });  
 
 
         this.historyText = this.scene.add.text(centerX, this.rollingArea.y + this.rollingArea.height * 1.3, '', {
@@ -86,7 +89,14 @@ export class NumberManager {
 
         this.createRollingNumber(calledNumber);
         this.updateHistory();
-        this.scene.bingoCard.highlightNumber(calledNumber);
+        
+        // Highlight number on all cards
+        this.highlightNumberOnCards(calledNumber);
+
+        // Update popup if it's visible
+        if (this.scene.numbersPopup && this.scene.numbersPopup.visible) {
+            this.scene.updateNumberGrid();
+        }
 
         this.timer = this.scene.time.delayedCall(
             Phaser.Math.Between(3000, 5000),
@@ -96,101 +106,76 @@ export class NumberManager {
         );
     }
 
-    createRollingNumber(number) {
+    highlightNumberOnCards(number) {
+        // Handle single card
+        if (this.scene.bingoCard) {
+            this.scene.bingoCard.highlightNumber(number);
+        }
+        
+        // Handle multiple cards
+        if (this.scene.bingoCard1) {
+            this.scene.bingoCard1.highlightNumber(number);
+        }
+        if (this.scene.bingoCard2) {
+            this.scene.bingoCard2.highlightNumber(number);
+        }
+    }
 
+    createRollingNumber(number) {
         const letter = this.getNumberLetter(number);
+        
+        // Clear previous rolling numbers to keep it simple
+        this.clearRollingNumbers();
+        
+        // Create single centered number display
         const container = this.scene.add.container(0, 0);
         
-        // const bg = this.scene.add.circle(0, 0, gameWidth * 0.08, this.letterColors[letter]);
-        // Background circle
-        // const bg = this.scene.add.image(0, 0, gameWidth * 0.04, this.letterColors[letter]);
         const bg = this.scene.add.image(0, 0, this.letterColors[letter])
-            .setDisplaySize(this.rollingArea.height, this.rollingArea.height)
+            .setDisplaySize(this.rollingArea.height * 0.9, this.rollingArea.height * 0.9)
             .setOrigin(0.5);
-        // const letterText = this.scene.add.text(-5, -15, letter, {
-        //     fontSize: Math.min(gameWidth * 0.04, 16) + 'px',
-        //     fontFamily: 'Arial Black',
-        //     fill: '#ffffff'
-        // }).setOrigin(0.5);
 
         const numberText = this.scene.add.text(0, 4, number, {
-            fontSize: Math.min(gameWidth * 0.06, 20) + 'px',
+            fontSize: Math.min(gameWidth * 0.08, 28) + 'px',
             fontFamily: 'Arial Black',
             fill: '#2a2727ff'
         }).setOrigin(0.5);
 
         container.add([bg, numberText]);
-        // Start position (off screen)
-        container.setPosition(this.rollingArea.x + this.rollingArea.width * 0.04
-            , this.rollingArea.y + this.rollingArea.height * 0.5);  
+        
+        // Position in center of rolling area
+        container.setPosition(
+            this.rollingArea.x + this.rollingArea.width * 0.5,
+            this.rollingArea.y + this.rollingArea.height * 0.5
+        );
 
-        this.animateRollingNumber(container);
-        this.rollingNumbers.push({ container, number, letter });
-    }
-
-    animateRollingNumber(container) {
-        // Calculate final position based on number of existing balls
-        const ballIndex = this.rollingNumbers.length - 1;
-        const ballSpacing = this.rollingArea.height * 1.2;
-        const finalX = this.rollingArea.x + (ballIndex * ballSpacing) + ballSpacing;
-
+        // Simple entrance animation
+        container.setScale(0);
         this.scene.tweens.add({
             targets: container,
-            x: finalX,
-            duration: 1000,
-            ease: 'Power2.easeOut',
-            onComplete: () => {
-                // Pause in position
-                this.scene.time.delayedCall(1500, () => {
-                    // Only move out if we have 4 or more balls
-                    if (this.rollingNumbers.length >= 4) {
-                        // Move out the oldest ball (first in array)
-                        const oldestBall = this.rollingNumbers[0];
-                        if (oldestBall && oldestBall.container) {
-                            this.scene.tweens.add({
-                                targets: oldestBall.container,
-                                x: this.rollingArea.x + this.rollingArea.width + 50,
-                                duration: 1000,
-                                ease: 'Power2.easeIn',
-                                onComplete: () => {
-                                    oldestBall.container.destroy();
-                                    // Remove from array
-                                    this.rollingNumbers.shift();
-                                    // Reposition remaining balls
-                                    this.repositionBalls();
-                                }
-                            });
-                        }
-                    }
-                });
-            }
-        });
-
-        this.scene.tweens.add({
-            targets: container,
-            scaleX: 1.7,
-            scaleY: 1.7,
-            duration: 500,
-            delay: 1000,
-            yoyo: true,
+            scaleX: 1,
+            scaleY: 1,
+            duration: 600,
             ease: 'Back.easeOut'
         });
+
+        // Store current number
+        this.currentNumber = { container, number, letter };
     }
 
-    repositionBalls() {
-        const ballSpacing = this.rollingArea.height * 1.2;
+    clearRollingNumbers() {
+        // Clear current number display
+        if (this.currentNumber && this.currentNumber.container) {
+            this.currentNumber.container.destroy();
+            this.currentNumber = null;
+        }
         
-        this.rollingNumbers.forEach((ballObj, index) => {
-            if (ballObj.container) {
-                const newX = this.rollingArea.x + (index * ballSpacing) + ballSpacing;
-                this.scene.tweens.add({
-                    targets: ballObj.container,
-                    x: newX,
-                    duration: 300,
-                    ease: 'Power2.easeOut'
-                });
+        // Clear any remaining rolling numbers
+        this.rollingNumbers.forEach(numberObj => {
+            if (numberObj.container) {
+                numberObj.container.destroy();
             }
         });
+        this.rollingNumbers = [];
     }
 
     getNumberLetter(number) {
@@ -204,15 +189,6 @@ export class NumberManager {
     updateHistory() {
         const recent = this.calledNumbers.slice(-6).join(' • ');
         this.historyText.setText('Recent: ' + recent);
-    }
-
-    clearRollingNumbers() {
-        this.rollingNumbers.forEach(numberObj => {
-            if (numberObj.container) {
-                numberObj.container.destroy();
-            }
-        });
-        this.rollingNumbers = [];
     }
 
     isNumberCalled(number) {

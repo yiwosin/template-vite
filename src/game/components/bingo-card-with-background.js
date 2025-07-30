@@ -3,8 +3,8 @@ import { gameWidth, gameHeight } from '../config.js';
 export class BingoCardWithBackground {
     constructor(scene, x = 0, y = 0) {
         this.scene = scene;
-        this.x = x;
-        this.y = y;
+        this.x = x || gameWidth / 2;
+        this.y = y || gameHeight * 0.5;
         this.card = [];
         this.cardCells = [];
         this.container = null;
@@ -44,12 +44,14 @@ export class BingoCardWithBackground {
         this.container = this.scene.add.container(this.x, this.y);
 
         const cardSize = Math.min(gameWidth * 0.85, gameHeight * 0.4);
-        const cellSize = cardSize / 5;
+        const cellSize = cardSize / 5.5;
 
         // Add background image
         if (this.scene.textures.exists(backgroundKey)) {
+            // this.backgroundImage = this.scene.add.image(0, 0, backgroundKey);
             this.backgroundImage = this.scene.add.image(0, 0, backgroundKey);
             this.backgroundImage.setDisplaySize(cardSize * 1, cardSize * 1.2);
+
             this.container.add(this.backgroundImage);
         } else {
             // Fallback: create a styled background
@@ -81,17 +83,17 @@ export class BingoCardWithBackground {
         for (let col = 0; col < 5; col++) {
             this.cardCells[col] = [];
             for (let row = 0; row < 5; row++) {
-                const x = (col - 2.05) * cellSize;
+                const x = (col - 2) * cellSize;
                 const y = (row - 2.2) * cellSize;
                 const cell = this.card[col][row];
                 
                 const cellBg = this.scene.add.rectangle(x, y, cellSize * 0.95, cellSize * 0.95, 
-                    cell.marked ? 0x27ae60 : 0xecf0f1).setAlpha(0)
+                    cell.marked ? 0x27ae60 : 0xecf0f1)
                     .setInteractive({ useHandCursor: true });
                 
                 const fontSize = cell.number === 'FREE' ? cellSize * 0.2 : cellSize * 0.35;
                 const cellText = this.scene.add.text(x, y, cell.number, {
-                    fontSize: Math.min(fontSize, 18) + 'px',
+                    fontSize: Math.min(fontSize, 12) + 'px',
                     fontFamily: 'Arial Black',
                     fill: cell.marked ? '#ffffff' : '#2c3e50'
                 }).setOrigin(0.5);
@@ -111,20 +113,21 @@ export class BingoCardWithBackground {
     }
 
     createBingoButton(cardSize) {
-        const buttonY = cardSize * 0.35; // Lower center part of card
-        const buttonWidth = cardSize * 0.4;
-        const buttonHeight = cardSize * 0.12;
+        const buttonY = cardSize * 0.5; // Lower center part of card
+        const buttonWidth = cardSize * 0.45;
+        const buttonHeight = cardSize * 0.14;
 
-        // BINGO button background
-        this.bingoButton = this.scene.add.rectangle(0, buttonY, 
-            buttonWidth, buttonHeight, 0xe74c3c)
-            .setInteractive({ useHandCursor: true });
         
-        // BINGO button text
+
+        this.bingoButton = this.scene.add.image(0, buttonY, 'bingo_bg')
+        .setInteractive({ useHandCursor: true }).setDisplaySize(buttonWidth, buttonHeight);
+        
+
+       // BINGO button text
         this.bingoButtonText = this.scene.add.text(0, buttonY, 'BINGO!', {
             fontSize: Math.min(buttonWidth * 0.2, 20) + 'px',
             fontFamily: 'Arial Black',
-            fill: '#ffffff'
+            fill: '#ffee07ff'
         }).setOrigin(0.5);
 
         // Add to container

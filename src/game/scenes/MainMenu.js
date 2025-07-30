@@ -16,8 +16,10 @@ export class MainMenu extends Scene
         const centerX = gameWidth / 2;
         const centerY = gameHeight / 2;
 
-                // Background
-        this.add.rectangle(centerX, centerY, gameWidth, gameHeight, 0x08b3ff);
+        // Background
+        this.add.image(centerX, centerY, 'background')
+        .setDisplaySize(this.cameras.main.width, this.cameras.main.height);
+        // this.add.rectangle(centerX, centerY, gameWidth, gameHeight, 0x08b3ff);
                 
         // Logo
         this.add.image(centerX,  gameHeight * 0.25, 'logo')
@@ -70,7 +72,7 @@ export class MainMenu extends Scene
         // playButton.on('pointerout', () => playButton.setFillStyle(0xe74c3c));
         playButton.on('pointerdown', () => {
             this.cameras.main.fade(200, 0, 0, 0);
-            this.time.delayedCall(200, () => this.scene.start('GameScene'));
+            this.time.delayedCall(200, () => this.scene.start('Lobby'));
         });
         
     }
