@@ -33,6 +33,34 @@ export class Preloader extends Scene
         this.load.setPath('assets');
 
         this.load.image('logo', 'logo.png');
+        this.load.image('button-bg', 'button.png');
+        this.load.image('home', 'home.png');
+        this.load.image('setting', 'setting.png');
+        this.load.image('ball_b', 'balls/ball_B.png');
+        this.load.image('ball_i', 'balls/ball_I.png');
+        this.load.image('ball_n', 'balls/ball_N.png');
+        this.load.image('ball_g', 'balls/ball_G.png');
+        this.load.image('ball_o', 'balls/ball_O.png');
+        this.load.image('bingo-card', 'bingo-card.png');
+
+         this.load.image('star', 'star.png'); // Add star image
+         // Debug: Listen for file load events
+        // this.load.on('filecomplete', (key, type, data) => {
+        //     console.log(`✅ Loaded: ${type} - ${key}`);
+        // });
+
+        // this.load.on('loaderror', (file) => {
+        //     console.error(`❌ Failed to load: ${file.type} - ${file.key} from ${file.url}`);
+        // });
+
+        // this.load.on('complete', () => {
+        //     console.log('🎯 All assets loaded');
+            
+        //     // Check if specific images exist in cache
+        //     console.log('Logo exists:', this.textures.exists('logo'));
+        //     console.log('Play-button exists:', this.textures.exists('play-button'));
+        // });
+
     }
 
     create ()
